@@ -1,16 +1,15 @@
 import "./App.css";
 import type { Food } from "./types/foods.types";
 import { useFetch } from "./hooks/useFetch";
-import { useDate } from "./hooks/useDate";
+import { env } from "./utils/env";
 
 function App() {
   const {
     loading,
     error,
     data: foods,
-  } = useFetch<Food[]>("http://localhost:3001/foods");
+  } = useFetch<Food[]>(env.apiUrl + "/foods");
 
-  const date = useDate();
   if (error) throw error;
   if (loading || !foods) return <div>Loading...</div>;
 
