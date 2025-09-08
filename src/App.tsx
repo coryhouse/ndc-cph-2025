@@ -1,17 +1,24 @@
 import "./App.css";
-import type { Food } from "./types/foods.types";
-import { useFetch } from "./hooks/useFetch";
+import { foodSchema } from "./types/foods.types";
 import { env } from "./utils/env";
+import { useQuery } from "@tanstack/react-query";
 
 function App() {
   const {
-    loading,
+    isLoading,
     error,
     data: foods,
-  } = useFetch<Food[]>(env.apiUrl + "/foods");
+  } = useQuery({
+    queryKey: ["foods"],
+    queryFn: async () => {
+      const response = await fetch(env.apiUrl + "/foos");
+      const json = await response.json();
+      return foodSchema.array().parse(json);
+    },
+  });
 
   if (error) throw error;
-  if (loading || !foods) return <div>Loading...</div>;
+  if (isLoading || !foods) return <div>Loading...</div>;
 
   return (
     <>
