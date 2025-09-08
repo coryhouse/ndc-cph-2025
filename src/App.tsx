@@ -1,4 +1,5 @@
 import "./App.css";
+import { FoodCard } from "./FoodCard";
 import { foodSchema } from "./types/foods.types";
 import { env } from "./utils/env";
 import { useQuery } from "@tanstack/react-query";
@@ -27,7 +28,7 @@ function App() {
       <ul>
         {foods.map((food) => (
           <li key={food.id}>
-            {food.name} - ${food.price}
+            <FoodCard food={food} />
           </li>
         ))}
       </ul>
