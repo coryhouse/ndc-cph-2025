@@ -1,33 +1,18 @@
-import { useEffect, useState } from "react";
 import "./App.css";
 import type { Food } from "./types/foods.types";
+import { useFetch } from "./hooks/useFetch";
+import { useDate } from "./hooks/useDate";
 
 function App() {
-  const [foods, setFoods] = useState<Food[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const {
+    loading,
+    error,
+    data: foods,
+  } = useFetch<Food[]>("http://localhost:3001/foods");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const resp = await fetch(import.meta.env.VITE_API_URL + "/foods");
-        if (!resp.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const data = await resp.json();
-        setFoods(data);
-      } catch (error) {
-        setError(error as Error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
-
+  const date = useDate();
   if (error) throw error;
-  if (loading) return <div>Loading...</div>;
+  if (loading || !foods) return <div>Loading...</div>;
 
   return (
     <>
@@ -40,13 +25,13 @@ function App() {
         Throw Error
       </button>
 
-      {/* <ul>
-        {foods.map((food: any) => (
+      <ul>
+        {foods.map((food) => (
           <li key={food.id}>
             {food.name} - ${food.price}
           </li>
         ))}
-      </ul> */}
+      </ul>
     </>
   );
 }
