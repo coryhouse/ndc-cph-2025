@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "start": "concurrently npm:dev npm:start:api",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
@@ -11,9 +12,11 @@
     "start:api": "json-server --watch db.json --port 3001"
   },
   "dependencies": {
+    "concurrently": "^9.2.1",
     "json-server": "0.17.4",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "react-error-boundary": "^6.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
