@@ -11,7 +11,7 @@ function App() {
   } = useQuery({
     queryKey: ["foods"],
     queryFn: async () => {
-      const response = await fetch(env.apiUrl + "/foos");
+      const response = await fetch(env.apiUrl + "/foods");
       const json = await response.json();
       return foodSchema.array().parse(json);
     },
@@ -23,13 +23,6 @@ function App() {
   return (
     <>
       <h1>Menu</h1>
-      <button
-        onClick={() => {
-          throw new Error("Test error");
-        }}
-      >
-        Throw Error
-      </button>
 
       <ul>
         {foods.map((food) => (
