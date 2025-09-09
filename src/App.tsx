@@ -1,39 +1,18 @@
-import "./App.css";
-import { FoodCard } from "./FoodCard";
+import ky from "ky";
+import Menu from "./Menu";
 import { foodSchema } from "./types/foods.types";
 import { env } from "./utils/env";
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
-function App() {
-  const {
-    isLoading,
-    error,
-    data: foods,
-  } = useQuery({
+export default function App() {
+  // TODO: Extract to custom hook / QueryOptions
+  const { data: foods } = useSuspenseQuery({
     queryKey: ["foods"],
     queryFn: async () => {
-      const response = await fetch(env.apiUrl + "/foods");
-      const json = await response.json();
+      const json = await ky.get(env.apiUrl + "/foods").json();
       return foodSchema.array().parse(json);
     },
   });
 
-  if (error) throw error;
-  if (isLoading || !foods) return <div>Loading...</div>;
-
-  return (
-    <>
-      <h1>Menu</h1>
-
-      <ul>
-        {foods.map((food) => (
-          <li key={food.id}>
-            <FoodCard food={food} />
-          </li>
-        ))}
-      </ul>
-    </>
-  );
+  return <Menu foods={foods} />;
 }
-
-export default App;
