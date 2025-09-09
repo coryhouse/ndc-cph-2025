@@ -3,10 +3,18 @@ import { useState } from "react";
 import type { NewFood } from "../types/foods.types";
 import { env } from "../utils/env";
 import { useMutation } from "@tanstack/react-query";
+import Input from "../shared/Input";
+import type { FormStatus } from "../types/form.types";
 
 export const Route = createFileRoute("/admin")({
   component: Admin,
 });
+
+type Errors = {
+  name?: string;
+  price?: string;
+  description?: string;
+};
 
 const newFood: NewFood = {
   name: "",
@@ -18,6 +26,7 @@ const newFood: NewFood = {
 
 function Admin() {
   const [food, setFood] = useState(newFood);
+  const [formStatus, setFormStatus] = useState<FormStatus>("idle");
   const { mutate: createFood, isPending } = useMutation({
     mutationFn: async (newFood: NewFood) => {
       return fetch(env.apiUrl + "/foods", {
@@ -48,42 +57,62 @@ function Admin() {
     }));
   }
 
+  function validate(food: NewFood) {
+    const errors: Errors = {};
+    if (food.name.length === 0) {
+      errors.name = "Name is required";
+    }
+    if (food.price <= 0) {
+      errors.price = "Price must be greater than 0";
+    }
+    if (food.description.length === 0) {
+      errors.description = "Description is required";
+    }
+    return errors;
+  }
+
+  const errors = validate(food);
+
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
         if (isPending) return; // Prevent multiple submissions
+        if (Object.keys(errors).length > 0) {
+          setFormStatus("submitted-with-errors");
+          return; // Don't submit if there are validation errors
+        }
         createFood(food);
       }}
     >
       <h1 className="p-2">Add new Food</h1>
-      <div>
-        <label htmlFor="name">Name:</label>
-        <input
-          className="border border-gray-300"
-          id="name"
-          value={food.name}
-          onChange={handleChange}
-        />
-      </div>
-      <div>
-        <label htmlFor="description">Description:</label>
-        <input
-          className="border border-gray-300"
-          id="description"
-          value={food.description}
-          onChange={handleChange}
-        />
-      </div>
-      <div>
-        <label htmlFor="price">Price:</label>
-        <input
-          className="border border-gray-300"
-          id="price"
-          value={food.price}
-          onChange={handleChange}
-        />
-      </div>
+      <Input
+        label="Name"
+        id="name"
+        value={food.name}
+        onChange={handleChange}
+        error={errors.name}
+        formStatus={formStatus}
+      />
+
+      <Input
+        id="price"
+        label="Price"
+        value={food.price}
+        onChange={handleChange}
+        error={errors.price}
+        formStatus={formStatus}
+      />
+
+      <Input
+        id="description"
+        label="Description"
+        value={food.description}
+        onChange={handleChange}
+        error={errors.description}
+        formStatus={formStatus}
+      />
+
       <input
         aria-disabled={isPending}
         type="submit"
