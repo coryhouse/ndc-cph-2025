@@ -6,7 +6,7 @@ type FoodProps = {
 };
 export default function Menu({ foods }: FoodProps) {
   return (
-    <>
+    <section>
       <h1>Menu</h1>
 
       <ul>
@@ -16,6 +16,6 @@ export default function Menu({ foods }: FoodProps) {
           </li>
         ))}
       </ul>
-    </>
+    </section>
   );
 }
